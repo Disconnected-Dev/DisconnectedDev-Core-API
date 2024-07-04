@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-from sqlalchemy import Boolean, column, ForeignKey, Integer, String
-from database import Base
+from sqlalchemy import Boolean, column, ForeignKey, Integer, String, List
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base
 
 
 class Blog(Base):
@@ -10,8 +12,9 @@ class Blog(Base):
     bID = Column(Integer, primary_key=True, index=True)
     bTitle = Column(String, index=True)
     bText = Column(String, index=True)
+    bFullText = Column(String, index=True)
     bCount = Column(Integer, index=True)
-    bDT = column(String, index=True)
+    bCreated = column(String, index=True)
 
 
 class users(Base):
@@ -22,3 +25,5 @@ class users(Base):
     uFurname = Column(String, index=True)
     uForename = Column(String, index=true)
     uRegDate = Column(String, index=True)
+    uEmail = Column(String, index=True)
+    UBlogs = Column(List, ForeignKey("Blog.bID"), index=True)
