@@ -12,6 +12,40 @@ def test_api_root():
     assert response.status_code == 200
     assert response.json() == {"msg": "Hello from Disconnected Dev API!"}
 
+#################### login endpoints ####################
+
+
+def test_api_login():
+    response = client.post("/login")
+    assert response.status_code == 200
+    assert response.json() == {"msg": "Endpoint to log you in"}
+
+
+def test_api_chgpass():
+    response = client.post("/login/change_password/testuser")
+    assert response.status_code == 200
+    assert response.json() == {"msg": "Your Password has been changed"}
+
+
+def test_api_chgpass_nonexistent():
+    response = client.post("/login/change_password/badusr")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "User not found!"}
+
+
+def test_api_fgtpass():
+    response = client.post("/login/forgotten_password/testuser")
+    assert response.status_code == 200
+    assert response.json() == {
+        "msg": "An email with a reset link has been sent to $email"}
+
+
+def test_api_fgtpass_nonexistent():
+    response = client.post("/login/forgotten_password/badusr")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "User not found!"}
+
+
 #################### blog endpoints ####################
 
 
