@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-from fastapi import FastAPI
-from pydantic import basemodel
+from fastapi import FastAPI, status, HTTPException, Depends
+from pydantic import BaseModel
 
 # define an instance of the fastapi app class
 dd_api = FastAPI()
@@ -12,7 +12,7 @@ class Blog(BaseModel):
     bTitle: str
     bText: str
     bFullText: str
-    bCount: int | none = none
+    bCount: int
     bCreated: str
 
 
@@ -29,27 +29,27 @@ async def blog_list():
     return {"msg": "Will return a list of blog entries"}
 
 
-@dd_api.post("/blogs/new_post/")
+@dd_api.post("/blogs/new_post/", status_code=status.HTTP_201_CREATED)
 async def new_blog_post():
     return {"msg": "Create new draft blog post"}
 
 
 @dd_api.put("/blogs/update_post/{blog_id}")
-async def update_blog_post():
+async def update_blog_post(blog_id: int):
     return {"msg": "Create new draft blog post"}
 
 
-@dd_api.put("/blogs/pub_post/{blog_id}")
+@dd_api.put("/blogs/publish/{blog_id}", status_code=status.HTTP_200_OK)
 async def publish_blog_post(blog_id: int):
     return {"msg": "Your post titled:###, has been published"}
 
 
-@dd_api.get("/blogs/users_posts")
-async def users_blog_posts():
+@dd_api.get("/blogs/users_blogs/{user_id}")
+async def users_blog_posts(user_id: int):
     return {"msg": "list of users blog posts"}
 
 
-@dd_api.get("/blogs/post/{blog_id}")
+@dd_api.get("/blogs/post/{blog_id}", status_code=status.HTTP_302_FOUND)
 async def blog_post(blog_id: int):
     # add user presence check for draft blog
     return {"msg": "Will return a specific blog entry"}
@@ -62,16 +62,22 @@ async def blog_remove(blog_id: int):
 #################### user endpoints ####################
 
 
-@dd_api.put("/users/add/")
+@dd_api.post("/users/add/")
 async def user_add():
     return {"msg": "The user has been added to the database"}
 
 
-@dd_api.post("/users/update/{user_id}")
-async def user_add(user_id: int):
+@dd_api.put("/users/update/{user_id}", status_code=status.HTTP_200_OK)
+async def user_update(user_id: int):
+    if user_id != int("600"):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found!")
     return {"msg": "The user has been updated"}
 
 
-@dd_api.put("/users/remove/{user_id}")
-async def user_add(user_id: int):
+@dd_api.delete("/users/remove/{user_id}")
+async def user_remove(user_id: int):
+    if user_id != int("600"):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Unable to remove, user not found!")
     return {"msg": "The user has been removed from the database"}
